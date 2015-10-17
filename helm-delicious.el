@@ -88,13 +88,13 @@
 
 ;; User variables
 (defvar helm-c-delicious-api-url
-  "https://api.del.icio.us/v1/posts/all?"
+  "https://api.pinboard.in/v1/posts/all?"
   "Url used to retrieve all bookmarks")
 (defvar helm-c-delicious-api-url-delete
-  "https://api.del.icio.us/v1/posts/delete?&url=%s"
+  "https://api.pinboard.in/v1/posts/delete?&url=%s"
   "Url used to delete bookmarks from delicious")
 (defvar helm-c-delicious-api-url-add
-  "https://api.del.icio.us/v1/posts/add?&url=%s&description=%s&tags=%s"
+  "https://api.pinboard.in/v1/posts/add?&url=%s&description=%s&tags=%s"
   "Url used to add bookmarks to delicious")
 
 (defcustom helm-c-delicious-cache-file "~/.delicious.cache"
@@ -165,7 +165,7 @@ You have to setup correctly `auth-sources' to make this function
 finding the path of your .authinfo file that is normally ~/.authinfo."
   (let ((helm-delicious-auth
          (auth-source-user-or-password  '("login" "password")
-                                        "api.del.icio.us:443"
+                                        "api.pinboard.in:443"
                                         "https")))
     (when helm-delicious-auth
       (setq helm-delicious-user (car helm-delicious-auth)
