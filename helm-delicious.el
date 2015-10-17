@@ -176,7 +176,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
 (defun helm-wget-retrieve-delicious (&optional sentinel)
   "Get the delicious bookmarks asynchronously with external program wget."
   (interactive)
-  (let ((fmd-command "wget -q --no-check-certificate -O %s --user %s --password %s %s"))
+  (let ((fmd-command "wget -q -O %s --user %s --password %s %s"))
     (unless (and helm-delicious-user helm-delicious-password)
       (helm-delicious-authentify))
     (message "Syncing with Delicious in Progress...")
