@@ -1,14 +1,14 @@
 ;;; helm-delicious.el --- helm extensions for delicious bookmarks
 
 ;; Filename: helm-delicious.el
-;; Description: 
+;; Description:
 ;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
 ;; Maintainer: Joe Bloggs <vapniks@yahoo.com>
 ;; Copyright (C) 2008, 2009 Thierry Volpiatto, all rights reserved
 ;; Version: 1.3
 ;; Last-Updated: 2013-11-11 01:28:00
 ;; URL: https://github.com/vapniks/helm-delicious
-;; Keywords: 
+;; Keywords:
 ;; Compatibility: Gnus Emacs 24.3
 ;;
 ;; Features that might be required by this library:
@@ -16,24 +16,24 @@
 ;; `helm' `xml'
 ;;
 
- 
+
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
 ;; published by the Free Software Foundation; either version 3, or
 ;; (at your option) any later version.
-;; 
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;; General Public License for more details.
-;; 
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 ;; Floor, Boston, MA 02110-1301, USA.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 
+;;
 ;;; Commentary:
 ;;  ==========
 ;;
@@ -79,9 +79,9 @@
 ;; That should create a "~/.delicious-cache" file.
 ;; (you can set that to another value with `helm-c-delicious-cache-file')
 ;; You can also add `helm-c-source-delicious-tv' to the `helm-sources'.
-;; 
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
+
 ;;; Code:
 
 (require 'xml)
@@ -118,7 +118,7 @@
 (defvar helm-c-delicious-cache nil)
 (defvar helm-delicious-last-candidate-to-deletion nil)
 (defvar helm-delicious-last-pattern nil)
-                                     
+
 (defvar helm-c-source-delicious-tv
   '((name . "Del.icio.us")
     (init . (lambda ()
@@ -264,7 +264,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
       (helm-wget-retrieve-delicious))
     (setq tag-list (helm-delicious-get-all-tags-from-cache))
     (loop for i in tag-list
-          for len = (length i) 
+          for len = (length i)
           when (> len tag-len) do (setq tag-len len))
     (with-temp-buffer
       (insert-file-contents helm-c-delicious-cache-file)
