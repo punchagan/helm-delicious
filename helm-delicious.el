@@ -87,15 +87,21 @@
 (require 'xml)
 
 ;; User variables
-(defvar helm-c-delicious-api-url
-  "https://api.pinboard.in/v1/posts/all?"
-  "Url used to retrieve all bookmarks")
-(defvar helm-c-delicious-api-url-delete
-  "https://api.pinboard.in/v1/posts/delete?&url=%s"
-  "Url used to delete bookmarks from delicious")
-(defvar helm-c-delicious-api-url-add
-  "https://api.pinboard.in/v1/posts/add?&url=%s&description=%s&tags=%s"
-  "Url used to add bookmarks to delicious")
+(defvar helm-delicious-base-url
+  "https://api.pinboard.in/v1"
+  "Base url for the API end points.")
+
+(defvar helm-delicious-endpoint-all-posts
+  "/posts/all?"
+  "End point for retrieving all bookmarks")
+
+(defvar helm-delicious-endpoint-delete
+  "/posts/delete?&url=%s"
+  "Url for deleting a bookmark")
+
+(defvar helm-delicious-endpoint-add
+  "/posts/add?&url=%s&description=%s&tags=%s"
+  "End-point for adding a bookmark.")
 
 (defcustom helm-c-delicious-cache-file "~/.delicious.cache"
   "The location of the cache file for `helm-delicious'."
@@ -186,7 +192,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
              helm-c-delicious-cache-file
              helm-delicious-user
              helm-delicious-password
-             helm-c-delicious-api-url))
+             (concat helm-delicious-base-url helm-delicious-endpoint-all-posts)))
     (set-process-sentinel
      (get-process "wget-retrieve-delicious")
      (if sentinel
@@ -203,8 +209,8 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
   (let* ((url     (if url-value-fn
                       (funcall url-value-fn candidate)
                       (helm-c-delicious-bookmarks-get-value candidate)))
-         (url-api (format helm-c-delicious-api-url-delete
-                          url))
+         (url-api (concat helm-delicious-base-url
+                          (format helm-delicious-endpoint-delete url)))
          helm-delicious-user
          helm-delicious-password
          auth)
@@ -290,7 +296,8 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
   (setq description
         (replace-regexp-in-string " " "+" description))
   (let* ((url     w3m-current-url)
-         (url-api (format helm-c-delicious-api-url-add url description tag))
+         (url-api (concat helm-delicious-base-url
+                          (format helm-delicious-endpoint-add url description tag)))
          helm-delicious-user
          helm-delicious-password
          auth)
