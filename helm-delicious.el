@@ -103,6 +103,17 @@
   "/posts/add?&url=%s&description=%s&tags=%s"
   "End-point for adding a bookmark.")
 
+(defvar helm-delicious-fetch-page-title t
+  "Page title for bookmark is fetched from page, if set.")
+
+(defvar helm-delicious-url-methods
+  '((elfeed-show-mode . (lambda ()
+                          (save-excursion
+                            (goto-char (point-min))
+                            (save-match-data
+                              (re-search-forward "^Title: \\(.*\\)$")
+                              (match-string 1)))))))
+
 (defcustom helm-c-delicious-cache-file "~/.delicious.cache"
   "The location of the cache file for `helm-delicious'."
   :group 'helm
@@ -286,18 +297,21 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
           collect (cons (concat "[" tag "] " desc) url))))
 
 ;;;###autoload
-(defun w3m-add-delicious-bookmark (description tag)
-  "Add a bookmark to delicious from w3m"
-  (interactive (list (read-from-minibuffer "Description: "
-                                           nil nil nil nil
-                                           w3m-current-title)
-                     (completing-read "Tag: "
-                                      (helm-delicious-get-all-tags-from-cache))))
-  (setq description
-        (replace-regexp-in-string " " "+" description))
-  (let* ((url     w3m-current-url)
+(defun helm-delicious-add-bookmark (url &optional description tags)
+  "Add a bookmark with the given url."
+  (interactive (let ((url (thing-at-point-url-at-point)))
+                 (list
+                  (read-from-minibuffer "Url: " url)
+                  (read-from-minibuffer "Description: "
+                                        (helm-delicious--get-title url))
+                  (completing-read-multiple "Tag: "
+                                            (helm-delicious-get-all-tags-from-cache)))))
+  (when (listp tags)
+    (setq tags (mapconcat 'identity tags "+")))
+  (let* ((description
+          (replace-regexp-in-string " " "+" description))
          (url-api (concat helm-delicious-base-url
-                          (format helm-delicious-endpoint-add url description tag)))
+                          (format helm-delicious-endpoint-add url description tags)))
          helm-delicious-user
          helm-delicious-password
          auth)
@@ -313,38 +327,45 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
       (goto-char (point-min))
       (if (re-search-forward "<result code=\"done\" />" nil t)
           (unwind-protect
-               (progn
-                 (message "%s added to delicious" description)
-                 (when current-prefix-arg
-                   (w3m-bookmark-write-file url
-                                            (replace-regexp-in-string "\+"
-                                                                      " "
-                                                                      description)
-                                            tag)
-                   (message "%s added to delicious and to w3m-bookmarks" description)))
+              (message "%s added to delicious" description)
             (helm-wget-retrieve-delicious))
-          (message "Fail to add bookmark to delicious")
-          (when current-prefix-arg
-            (if (y-or-n-p "Add anyway to w3m-bookmarks?")
-                (progn
-                  (w3m-bookmark-write-file url
-                                           (replace-regexp-in-string "\+" " "
-                                                                     description)
-                                           tag)
-                  (message "%s added to w3m-bookmarks" description))))))))
+        (message "Failed to add bookmark to delicious")))))
+
+(defun helm-delicious--get-title (url)
+  "Get title/description for a url.
+
+Buffer specific methods can be defined by adding to the alist
+`helm-delicious-url-methods'. For buffers that don't have custom
+methods, the title is fetched by accessing the url, if
+`helm-delicious-fetch-page-title' is set."
+
+  (let ((method (cdr (assoc major-mode helm-delicious-url-methods))))
+    (if method
+        (funcall method)
+      (if helm-delicious-fetch-page-title
+          (let ((url-buffer (url-retrieve-synchronously url)))
+            (if url-buffer
+                (with-current-buffer url-buffer
+                  (goto-char (point-min))
+                  (save-match-data
+                    (re-search-forward "<title>\\(.*\\)</title>" nil t 1)
+                    (match-string-no-properties 1)))
+              (buffer-name (current-buffer))))
+        (buffer-name (current-buffer))))))
 
 (defun helm-delicious-get-all-tags-from-cache ()
-  "Get the list of all your tags from Delicious
-That is used for completion on tags when adding bookmarks
-to Delicious"
+  "Return a list of all tags ever used by you.
+
+ Used for completion on tags when adding bookmarks."
   (with-current-buffer (find-file-noselect helm-c-delicious-cache-file)
     (goto-char (point-min))
     (let* ((all (car (xml-parse-region (point-min) (point-max))))
-           (tag (xml-get-children all 'post))
+           (posts (xml-get-children all 'post))
            tag-list)
-      (dolist (i tag)
-        (let ((tg (xml-get-attribute i 'tag)))
-          (unless (member tg tag-list) (push tg tag-list))))
+      (dolist (post posts)
+        (let ((tags (xml-get-attribute post 'tag)))
+          (dolist (tag (split-string tags " "))
+            (unless (member tag tag-list) (push tag tag-list)))))
       (kill-buffer)
       tag-list)))
 
@@ -386,9 +407,5 @@ to Delicious"
               rem-pattern nil nil nil "*Helm Delicious*")))
 
 (provide 'helm-delicious)
-
-
-;; (magit-push)
-;; (yaoddmuse-post "EmacsWiki" "helm-delicious.el" (buffer-name) (buffer-string) "update")
 
 ;;; helm-delicious.el ends here
