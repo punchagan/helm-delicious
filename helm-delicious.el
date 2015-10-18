@@ -299,7 +299,8 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
 ;;;###autoload
 (defun helm-delicious-add-bookmark (url &optional description tags)
   "Add a bookmark with the given url."
-  (interactive (let ((url (thing-at-point-url-at-point)))
+  (interactive (let ((url (or (thing-at-point-url-at-point)
+                              (get-text-property (point) 'shr-url))))
                  (list
                   (read-from-minibuffer "Url: " url)
                   (read-from-minibuffer "Description: "
