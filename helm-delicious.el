@@ -297,7 +297,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
           collect (cons (concat "[" tag "] " desc) url))))
 
 ;;;###autoload
-(defun helm-delicious-add-bookmark (url &optional description tags)
+(defun helm-delicious-add-bookmark (url &optional description tags toread)
   "Add a bookmark with the given url."
   (interactive (let ((url (or (thing-at-point-url-at-point)
                               (get-text-property (point) 'shr-url))))
@@ -306,7 +306,8 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
                   (read-from-minibuffer "Description: "
                                         (helm-delicious--get-title url))
                   (completing-read-multiple "Tag: "
-                                            (helm-delicious-get-all-tags-from-cache)))))
+                                            (helm-delicious-get-all-tags-from-cache))
+                  (y-or-n-p "Save as toread? "))))
   (when (listp tags)
     (setq tags (mapconcat 'identity tags "+")))
   (let* ((description
@@ -316,6 +317,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
          helm-delicious-user
          helm-delicious-password
          auth)
+    (when toread (setq url-api (concat url-api "&toread=yes")))
     (unless (and helm-delicious-user helm-delicious-password)
       (helm-delicious-authentify))
     (setq auth (concat helm-delicious-user ":" helm-delicious-password))
