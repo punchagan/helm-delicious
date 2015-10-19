@@ -128,10 +128,10 @@
 
 ;; Faces
 (defface helm-delicious-tag-face '((t (:foreground "VioletRed4" :weight bold)))
-  "Face for w3m bookmarks" :group 'helm)
+         "Face for w3m bookmarks" :group 'helm)
 
 (defface helm-w3m-bookmarks-face '((t (:foreground "cyan1" :underline t)))
-  "Face for w3m bookmarks" :group 'helm)
+         "Face for w3m bookmarks" :group 'helm)
 
 ;; Internal variables (don't modify)
 (defvar helm-c-delicious-cache nil)
@@ -147,15 +147,15 @@
     (candidates . (lambda () (mapcar #'car helm-c-delicious-cache)))
     (candidate-transformer helm-c-highlight-delicious-bookmarks)
     (action . (("Browse Url default" . (lambda (elm)
-                                 (helm-c-delicious-browse-bookmark elm)
-                                 (setq helm-delicious-last-pattern helm-pattern)))
+                                         (helm-c-delicious-browse-bookmark elm)
+                                         (setq helm-delicious-last-pattern helm-pattern)))
                ("Browse Url Firefox" . (lambda (candidate)
                                          (helm-c-delicious-browse-bookmark candidate 'firefox)))
                ("Browse Url Chromium" . (lambda (candidate)
-                                         (helm-c-delicious-browse-bookmark candidate 'chromium)))
+                                          (helm-c-delicious-browse-bookmark candidate 'chromium)))
                ("Browse Url w3m" . (lambda (candidate)
-                                         (helm-c-delicious-browse-bookmark candidate 'w3m)
-                                         (setq helm-delicious-last-pattern helm-pattern)))
+                                     (helm-c-delicious-browse-bookmark candidate 'w3m)
+                                     (setq helm-delicious-last-pattern helm-pattern)))
                ("Delete bookmark" . (lambda (elm)
                                       (helm-c-delicious-delete-bookmark elm)))
                ("Copy Url" . (lambda (elm)
@@ -163,8 +163,8 @@
                ("Update Tags" . (lambda (elm)
                                   (helm-c-delicious-update-tags elm)))
                ("Update All" . (lambda (elm)
-                             (message "Wait Loading bookmarks from Delicious...")
-                             (helm-delicious-update-async)))))))
+                                 (message "Wait Loading bookmarks from Delicious...")
+                                 (helm-delicious-update-async)))))))
 
 
 ;; (helm 'helm-c-source-delicious-tv)
@@ -214,18 +214,18 @@ Uses external program curl."
      (get-process "curl-retrieve-delicious")
      (if sentinel
          sentinel
-         #'(lambda (process event)
-             (if (string= event "finished\n")
-                 (message "Syncing with Delicious...Done.")
-                 (message "Failed to synchronize with Delicious."))
-             (setq helm-c-delicious-cache nil))))))
+       #'(lambda (process event)
+           (if (string= event "finished\n")
+               (message "Syncing with Delicious...Done.")
+             (message "Failed to synchronize with Delicious."))
+           (setq helm-c-delicious-cache nil))))))
 
 
 (defun helm-c-delicious-delete-bookmark (candidate &optional url-value-fn sentinel)
   "Delete delicious bookmark on the delicious side"
   (let* ((url     (if url-value-fn
                       (funcall url-value-fn candidate)
-                      (helm-c-delicious-bookmarks-get-value candidate)))
+                    (helm-c-delicious-bookmarks-get-value candidate)))
          (url-api (concat helm-delicious-base-url
                           (format helm-delicious-endpoint-delete url)))
          helm-delicious-user
@@ -237,9 +237,9 @@ Uses external program curl."
     (message "Wait sending request to delicious...")
     (setq helm-delicious-last-candidate-to-deletion candidate)
     (apply #'start-process "curl-delicious-delete" "*delicious-delete*" "curl"
-                   (list "-u"
-                         auth
-                         url-api))
+           (list "-u"
+                 auth
+                 url-api))
     (set-process-sentinel (get-process "curl-delicious-delete")
                           (or sentinel 'helm-delicious-delete-sentinel))))
 
@@ -258,9 +258,9 @@ Uses external program curl."
           (message "Ok %s have been deleted with success"
                    (substring-no-properties
                     helm-delicious-last-candidate-to-deletion)))
-        (message "Fail to delete %s"
-                 (substring-no-properties
-                  helm-delicious-last-candidate-to-deletion)))
+      (message "Fail to delete %s"
+               (substring-no-properties
+                helm-delicious-last-candidate-to-deletion)))
     (setq helm-delicious-last-candidate-to-deletion nil)))
 
 
@@ -411,12 +411,12 @@ methods, the title is fetched by accessing the url, if
   "Highlight all Delicious bookmarks"
   (let (tag rest-text)
     (loop for i in books
-       when (string-match "\\[.*\\] *" i)
-       collect (concat (propertize (match-string 0 i)
-                                   'face 'helm-delicious-tag-face)
-                       (propertize (substring i (match-end 0))
-                                   'face 'helm-w3m-bookmarks-face
-                                   'help-echo (helm-c-delicious-bookmarks-get-value i))))))
+          when (string-match "\\[.*\\] *" i)
+          collect (concat (propertize (match-string 0 i)
+                                      'face 'helm-delicious-tag-face)
+                          (propertize (substring i (match-end 0))
+                                      'face 'helm-w3m-bookmarks-face
+                                      'help-echo (helm-c-delicious-bookmarks-get-value i))))))
 
 ;;;###autoload
 (defun helm-delicious ()
@@ -426,7 +426,7 @@ methods, the title is fetched by accessing the url, if
   (let ((rem-pattern (if helm-delicious-last-pattern
                          helm-delicious-last-pattern)))
     (helm 'helm-c-source-delicious-tv
-              rem-pattern nil nil nil "*Helm Delicious*")))
+          rem-pattern nil nil nil "*Helm Delicious*")))
 
 (provide 'helm-delicious)
 
