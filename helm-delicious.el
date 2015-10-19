@@ -38,7 +38,9 @@
 ;;  ==========
 ;;
 ;; Helm interface for Delicious bookmarks.
-;; This code use curl and wget.
+
+;; This code use `curl' for asynchronous requests to the server.
+
 ;; You need to install `helm' also.
 ;; Install:
 ;; =======
@@ -158,9 +160,9 @@
                                       (helm-c-delicious-delete-bookmark elm)))
                ("Copy Url" . (lambda (elm)
                                (kill-new (helm-c-delicious-bookmarks-get-value elm))))
-               ("Update" . (lambda (elm)
+               ("Update All" . (lambda (elm)
                              (message "Wait Loading bookmarks from Delicious...")
-                             (helm-wget-retrieve-delicious)))))))
+                             (helm-delicious-update-async)))))))
 
 
 ;; (helm 'helm-c-source-delicious-tv)
@@ -190,22 +192,24 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
       nil)))
 
 ;;;###autoload
-(defun helm-wget-retrieve-delicious (&optional sentinel)
-  "Get the delicious bookmarks asynchronously with external program wget."
+(defun helm-delicious-update-async (&optional sentinel)
+  "Get the delicious bookmarks asynchronously
+
+Uses external program curl."
   (interactive)
-  (let ((fmd-command "wget -q -O %s --user %s --password %s %s"))
+  (let ((fmd-command "curl -s -o %s -u %s:%s %s"))
     (unless (and helm-delicious-user helm-delicious-password)
       (helm-delicious-authentify))
     (message "Syncing with Delicious in Progress...")
     (start-process-shell-command
-     "wget-retrieve-delicious" nil
+     "curl-retrieve-delicious" nil
      (format fmd-command
              helm-c-delicious-cache-file
              helm-delicious-user
              helm-delicious-password
              (concat helm-delicious-base-url helm-delicious-endpoint-all-posts)))
     (set-process-sentinel
-     (get-process "wget-retrieve-delicious")
+     (get-process "curl-retrieve-delicious")
      (if sentinel
          sentinel
          #'(lambda (process event)
@@ -278,7 +282,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
         (tag-len 0))
     (unless (file-exists-p helm-c-delicious-cache-file)
       (message "Wait Loading bookmarks from Delicious...")
-      (helm-wget-retrieve-delicious))
+      (helm-delicious-update-async))
     (setq tag-list (helm-delicious-get-all-tags-from-cache))
     (loop for i in tag-list
           for len = (length i)
@@ -331,7 +335,7 @@ finding the path of your .authinfo file that is normally ~/.authinfo."
       (if (re-search-forward "<result code=\"done\" />" nil t)
           (unwind-protect
               (message "%s added to delicious" description)
-            (helm-wget-retrieve-delicious))
+            (helm-delicious-update-async))
         (message "Failed to add bookmark to delicious")))))
 
 (defun helm-delicious--get-title (url)
