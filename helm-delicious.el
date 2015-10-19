@@ -160,6 +160,8 @@
                                       (helm-c-delicious-delete-bookmark elm)))
                ("Copy Url" . (lambda (elm)
                                (kill-new (helm-c-delicious-bookmarks-get-value elm))))
+               ("Update Tags" . (lambda (elm)
+                                  (helm-c-delicious-update-tags elm)))
                ("Update All" . (lambda (elm)
                              (message "Wait Loading bookmarks from Delicious...")
                              (helm-delicious-update-async)))))))
@@ -309,7 +311,7 @@ Uses external program curl."
                   (read-from-minibuffer "Url: " url)
                   (read-from-minibuffer "Description: "
                                         (helm-delicious--get-title url))
-                  (completing-read-multiple "Tag: "
+                  (completing-read-multiple "Tags: "
                                             (helm-delicious-get-all-tags-from-cache))
                   (y-or-n-p "Save as toread? "))))
   (when (listp tags)
@@ -359,6 +361,19 @@ methods, the title is fetched by accessing the url, if
                     (match-string-no-properties 1)))
               (buffer-name (current-buffer))))
         (buffer-name (current-buffer))))))
+
+(defun helm-c-delicious-update-tags (candidate)
+  "Update tags for a given bookmark."
+  (let* ((candidate-re "^\\[\\(.*?\\)\\]\s*\\(.*\\)$")
+         (url (helm-c-delicious-bookmarks-get-value candidate))
+         (old-tags (replace-regexp-in-string candidate-re "\\1" candidate))
+         (description (replace-regexp-in-string candidate-re "\\2" candidate))
+         (tags (completing-read-multiple "Tags: "
+                                         (helm-delicious-get-all-tags-from-cache)
+                                         nil
+                                         nil
+                                         (replace-regexp-in-string " " "," old-tags))))
+    (helm-delicious-add-bookmark url description tags)))
 
 (defun helm-delicious-get-all-tags-from-cache ()
   "Return a list of all tags ever used by you.
