@@ -1,0 +1,79 @@
+* helm-pinboard --- Helm extension for Pinboard bookmarks  -*- lexical-binding: t; -*-
+
+Copyright (C) 2008 - 2009 Thierry Volpiatto <thierry.volpiatto@gmail.com>
+              2009 - 2015 Joe Bloggs <vapniks@yahoo.com>
+              2015 Puneeth Chaganti <punchagan@muse-amuse.in>
+
+This is a fork of helm-delicious.el written by Thierry Volpiatto.
+
+  - Author: Puneeth Chaganti <punchagan@muse-amuse.in>
+  - Keywords: tools, comm, convenience
+  - URL: https://github.com/punchagan/helm-pinboard
+  - Version: 1.4
+  - Created: 2015-10-24
+Package-Requires: ((helm "1.4.0") (cl-lib "0.3"))
+
+This file is NOT part of GNU Emacs.
+
+* License
+
+Licensed under the [[http://www.gnu.org/licenses/][GPL version 3]] or later.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+Floor, Boston, MA 02110-1301, USA.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-----
+
+* Commentary
+ ==========
+
+Helm interface for Pinboard bookmarks.
+
+Pinboard API is more or less compatible with Delicious API and this is fork
+of helm-delicious.el. The code should probably work with delicious by just
+changing the API base url, though this is untested.
+
+This code use `curl' for asynchronous requests to the server.
+
+  - Setup:
+=====
+
+Add to .emacs:
+(require 'helm-pinboard)
+
+After subscribing to http://pinboard.in/ setup your login and password:
+
+You can set it up in your init file by setting `helm-pinboard-user' and
+`helm-pinboard-password'.
+
+or save it to your .authinfo file by adding a line like this:
+
+machine api.del.icio.us:443 port https login xxxxx password xxxxx
+
+and add to you init file (.emacs):
+
+(require 'auth-source)
+
+(if (file-exists-p "~/.authinfo.gpg")
+    (setq auth-sources '((:source "~/.authinfo.gpg" :host t :protocol t)))
+    (setq auth-sources '((:source "~/.authinfo" :host t :protocol t))))
+
+  - Warning:
+
+DON'T CALL `helm-pinboard-authentify', this will set your login and password
+globally.
+
+  - Use:
+===
+
+M-x helm-pinboard
+-----
+
+
+
+README.org generated from the library header in ~helm-delicious.el~ by [[https://github.com/punchagan/h2o][h2o]]
