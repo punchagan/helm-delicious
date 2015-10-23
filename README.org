@@ -1,4 +1,4 @@
-* helm-pinboard --- Helm extension for Pinboard bookmarks
+* helm-pinboard --- Helm extension for Pinboard bookmarks  -*- lexical-binding: t; -*-
 
 Copyright (C) 2008 - 2009 Thierry Volpiatto <thierry.volpiatto@gmail.com>
               2009 - 2015 Joe Bloggs <vapniks@yahoo.com>
@@ -30,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -----
 
 * Commentary
- ==========
 
 Helm interface for Pinboard bookmarks.
 
@@ -41,7 +40,6 @@ changing the API base url, though this is untested.
 This code use `curl' for asynchronous requests to the server.
 
   - Setup:
-=====
 
 Add to .emacs:
 (require 'helm-pinboard)
@@ -63,17 +61,14 @@ and add to you init file (.emacs):
     (setq auth-sources '((:source "~/.authinfo.gpg" :host t :protocol t)))
     (setq auth-sources '((:source "~/.authinfo" :host t :protocol t))))
 
-  - Warning:
-
 DON'T CALL `helm-pinboard-authentify', this will set your login and password
 globally.
 
   - Use:
-===
 
 M-x helm-pinboard
 -----
 
 
 
-README.org generated from the library header in ~helm-delicious.el~ by [[https://github.com/punchagan/h2o][h2o]]
+README.org generated from the library header in ~helm-pinboard.el~ by [[https://github.com/punchagan/h2o][h2o]]
