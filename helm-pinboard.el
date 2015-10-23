@@ -41,7 +41,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Commentary:
-;;  ==========
 ;;
 ;; Helm interface for Pinboard bookmarks.
 
@@ -52,7 +51,6 @@
 ;; This code use `curl' for asynchronous requests to the server.
 
 ;; Setup:
-;; =====
 
 ;; Add to .emacs:
 ;; (require 'helm-pinboard)
@@ -74,13 +72,10 @@
 ;;     (setq auth-sources '((:source "~/.authinfo.gpg" :host t :protocol t)))
 ;;     (setq auth-sources '((:source "~/.authinfo" :host t :protocol t))))
 
-;; Warning:
-
 ;; DON'T CALL `helm-pinboard-authentify', this will set your login and password
 ;; globally.
 
 ;; Use:
-;; ===
 
 ;; M-x helm-pinboard
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
