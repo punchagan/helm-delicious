@@ -137,7 +137,7 @@
 (defvar helm-pinboard-last-pattern nil)
 
 (defvar helm-c-source-pinboard-tv
-  '((name . "Del.icio.us")
+  '((name . "pinboard.in")
     (init . (lambda ()
               (unless helm-c-pinboard-cache
                 (setq helm-c-pinboard-cache
