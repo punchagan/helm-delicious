@@ -106,13 +106,15 @@
 (defvar helm-pinboard-fetch-page-title t
   "Page title for bookmark is fetched from page, if set.")
 
-(defvar helm-pinboard-url-methods
+(defvar helm-pinboard-get-title-methods
   '((elfeed-show-mode . (lambda ()
-                          (save-excursion
-                            (goto-char (point-min))
-                            (save-match-data
-                              (re-search-forward "^Title: \\(.*\\)$")
-                              (match-string 1)))))))
+                          (elfeed-entry-title elfeed-show-entry))))
+  "Alist to define custom methods to get title for a bookmark.")
+
+(defvar helm-pinboard-get-url-methods
+  '((elfeed-show-mode . (lambda ()
+                          (elfeed-entry-link elfeed-show-entry))))
+  "Alist to define custom methods to get URL for a bookmark.")
 
 (defcustom helm-c-pinboard-cache-file "~/.pinboard.cache"
   "The location of the cache file for `helm-pinboard'."
@@ -302,7 +304,8 @@ Uses external program curl."
 (defun helm-pinboard-add-bookmark (url &optional description tags toread)
   "Add a bookmark with the given url."
   (interactive (let ((url (or (thing-at-point-url-at-point)
-                              (get-text-property (point) 'shr-url))))
+                              (get-text-property (point) 'shr-url)
+                              (helm-pinboard--get-url-using-methods))))
                  (list
                   (read-from-minibuffer "Url: " url)
                   (read-from-minibuffer "Description: "
@@ -340,11 +343,11 @@ Uses external program curl."
   "Get title/description for a url.
 
 Buffer specific methods can be defined by adding to the alist
-`helm-pinboard-url-methods'. For buffers that don't have custom
-methods, the title is fetched by accessing the url, if
+`helm-pinboard-get-url-methods'. For buffers that don't have
+custom methods, the title is fetched by accessing the url, if
 `helm-pinboard-fetch-page-title' is set."
 
-  (let ((method (cdr (assoc major-mode helm-pinboard-url-methods))))
+  (let ((method (cdr (assoc major-mode helm-pinboard-get-title-methods))))
     (if method
         (funcall method)
       (if helm-pinboard-fetch-page-title
@@ -357,6 +360,15 @@ methods, the title is fetched by accessing the url, if
                     (match-string-no-properties 1)))
               (buffer-name (current-buffer))))
         (buffer-name (current-buffer))))))
+
+(defun helm-pinboard--get-url-using-methods ()
+  "Get url for a buffer using custom methods, if any.
+
+Buffer specific methods can be defined by adding to the alist
+`helm-pinboard-get-url-methods'."
+
+  (let ((method (cdr (assoc major-mode helm-pinboard-get-url-methods))))
+    (when method (funcall method))))
 
 (defun helm-c-pinboard-update-tags (candidate)
   "Update tags for a given bookmark."
